@@ -6,6 +6,8 @@ import EmployeeDashboard from "./dashboard/EmployeeDashboard";
 import AdminDashboard from "./dashboard/AdminDashboard";
 import LeaveRequestForm from "./leave/LeaveRequestForm";
 import RequestReviewModal from "./admin/RequestReviewModal";
+import LeaveHistoryView from "./leave/LeaveHistoryView";
+import ReportingModule from "./admin/ReportingModule";
 
 interface HomeProps {
   userRole?: "employee" | "admin";
@@ -26,6 +28,9 @@ const Home = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showLeaveRequestForm, setShowLeaveRequestForm] = useState(false);
   const [showRequestReviewModal, setShowRequestReviewModal] = useState(false);
+  const [showLeaveHistory, setShowLeaveHistory] = useState(false);
+  const [showReports, setShowReports] = useState(false);
+  const [activeView, setActiveView] = useState<string>("dashboard");
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(
     null,
   );
@@ -34,12 +39,39 @@ const Home = ({
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const handleLogout = () => {
+    // In a real app, you would clear authentication tokens here
+    alert("You have been logged out successfully!");
+    // Redirect to login page or show login form
+    setActiveView("login");
+  };
+
   const handleCreateLeaveRequest = () => {
+    setActiveView("leaveRequest");
     setShowLeaveRequestForm(true);
+    setShowLeaveHistory(false);
+    setShowReports(false);
   };
 
   const handleViewLeaveHistory = () => {
-    navigate("/leave-history");
+    setActiveView("leaveHistory");
+    setShowLeaveHistory(true);
+    setShowLeaveRequestForm(false);
+    setShowReports(false);
+  };
+
+  const handleViewReports = () => {
+    setActiveView("reports");
+    setShowReports(true);
+    setShowLeaveRequestForm(false);
+    setShowLeaveHistory(false);
+  };
+
+  const handleViewDashboard = () => {
+    setActiveView("dashboard");
+    setShowLeaveRequestForm(false);
+    setShowLeaveHistory(false);
+    setShowReports(false);
   };
 
   const handleReviewRequest = (requestId: string) => {
@@ -49,6 +81,7 @@ const Home = ({
 
   const handleCloseLeaveRequestForm = () => {
     setShowLeaveRequestForm(false);
+    setActiveView("dashboard");
   };
 
   const handleCloseRequestReviewModal = () => {
@@ -56,36 +89,93 @@ const Home = ({
     setSelectedRequestId(null);
   };
 
+  // Handle navigation from header or sidebar
+  const handleNavigation = (path: string) => {
+    switch (path) {
+      case "/":
+        handleViewDashboard();
+        break;
+      case "/request-leave":
+        handleCreateLeaveRequest();
+        break;
+      case "/leave-history":
+        handleViewLeaveHistory();
+        break;
+      case "/admin/reports":
+        handleViewReports();
+        break;
+      case "/profile":
+        alert("Profile page would open here");
+        break;
+      case "/settings":
+        alert("Settings page would open here");
+        break;
+      case "/help":
+        alert("Help & Support page would open here");
+        break;
+      case "/logout":
+        handleLogout();
+        break;
+      default:
+        handleViewDashboard();
+    }
+  };
+
+  const renderContent = () => {
+    if (showLeaveRequestForm) {
+      return <LeaveRequestForm onSubmit={handleCloseLeaveRequestForm} />;
+    }
+
+    if (showLeaveHistory) {
+      return (
+        <LeaveHistoryView employeeName={userName} employeeId={employeeId} />
+      );
+    }
+
+    if (showReports) {
+      return <ReportingModule />;
+    }
+
+    if (userRole === "employee") {
+      return (
+        <EmployeeDashboard
+          employeeName={userName}
+          employeeId={employeeId}
+          department={department}
+          onCreateLeaveRequest={handleCreateLeaveRequest}
+          onViewLeaveHistory={handleViewLeaveHistory}
+        />
+      );
+    }
+
+    return (
+      <AdminDashboard
+        userName={userName}
+        department={department}
+        onReviewRequest={handleReviewRequest}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
-      <Header userRole={userRole} userName={userName} userAvatar={userAvatar} />
+      <Header
+        userRole={userRole}
+        userName={userName}
+        userAvatar={userAvatar}
+        onNavigation={handleNavigation}
+        onLogout={handleLogout}
+      />
 
       <div className="flex flex-1 pt-16 overflow-hidden">
         <Sidebar
           userRole={userRole}
           collapsed={sidebarCollapsed}
           onToggleCollapse={handleToggleSidebar}
+          onNavigation={handleNavigation}
         />
 
-        <main className="flex-1 overflow-auto">
-          {showLeaveRequestForm ? (
-            <LeaveRequestForm onSubmit={handleCloseLeaveRequestForm} />
-          ) : userRole === "employee" ? (
-            <EmployeeDashboard
-              employeeName={userName}
-              employeeId={employeeId}
-              department={department}
-              onCreateLeaveRequest={handleCreateLeaveRequest}
-              onViewLeaveHistory={handleViewLeaveHistory}
-            />
-          ) : (
-            <AdminDashboard
-              userName={userName}
-              department={department}
-              onReviewRequest={handleReviewRequest}
-            />
-          )}
-        </main>
+        <main className="flex-1 overflow-auto">{renderContent()}</main>
       </div>
 
       {showRequestReviewModal && (

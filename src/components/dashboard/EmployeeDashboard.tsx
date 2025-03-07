@@ -36,7 +36,7 @@ const EmployeeDashboard = ({
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
           <Button
-            onClick={onCreateLeaveRequest}
+            onClick={() => onCreateLeaveRequest()}
             className="flex items-center gap-2"
           >
             <PlusCircle className="h-4 w-4" />
@@ -44,7 +44,7 @@ const EmployeeDashboard = ({
           </Button>
           <Button
             variant="outline"
-            onClick={onViewLeaveHistory}
+            onClick={() => onViewLeaveHistory()}
             className="flex items-center gap-2"
           >
             <FileText className="h-4 w-4" />

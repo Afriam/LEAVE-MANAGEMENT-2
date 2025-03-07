@@ -2,10 +2,11 @@ import mysql from "mysql2/promise";
 
 // Database connection configuration
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "college_leave_management",
+  host: import.meta.env.VITE_DB_HOST || "localhost",
+  port: Number(import.meta.env.VITE_DB_PORT) || 3306,
+  user: import.meta.env.VITE_DB_USERNAME || "root",
+  password: import.meta.env.VITE_DB_PASSWORD || "",
+  database: import.meta.env.VITE_DB_DATABASE || "college_leave_management",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

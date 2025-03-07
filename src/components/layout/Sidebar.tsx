@@ -30,6 +30,7 @@ interface SidebarProps {
   userRole?: "employee" | "admin";
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  onNavigation?: (path: string) => void;
 }
 
 interface NavItem {
@@ -43,6 +44,7 @@ const Sidebar = ({
   userRole = "employee",
   collapsed = false,
   onToggleCollapse = () => {},
+  onNavigation = (path) => console.log(`Navigate to ${path}`),
 }: SidebarProps) => {
   const location = useLocation();
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({
@@ -220,11 +222,11 @@ const Sidebar = ({
                     {!collapsed && (
                       <div className="pl-8 mt-1 space-y-1">
                         {item.children.map((child, childIndex) => (
-                          <Link
+                          <button
                             key={childIndex}
-                            to={child.path}
+                            onClick={() => onNavigation(child.path)}
                             className={cn(
-                              "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                              "flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left",
                               isActive(child.path)
                                 ? "bg-gray-100 text-primary"
                                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
@@ -232,7 +234,7 @@ const Sidebar = ({
                           >
                             {child.icon}
                             <span className="ml-3">{child.title}</span>
-                          </Link>
+                          </button>
                         ))}
                       </div>
                     )}
@@ -245,8 +247,8 @@ const Sidebar = ({
               <TooltipProvider key={index}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Link
-                      to={item.path}
+                    <button
+                      onClick={() => onNavigation(item.path)}
                       className={cn(
                         "flex items-center justify-center p-3 rounded-md",
                         isActive(item.path)
@@ -255,17 +257,17 @@ const Sidebar = ({
                       )}
                     >
                       {item.icon}
-                    </Link>
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent side="right">{item.title}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ) : (
-              <Link
+              <button
                 key={index}
-                to={item.path}
+                onClick={() => onNavigation(item.path)}
                 className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                  "flex items-center px-3 py-2 text-sm font-medium rounded-md w-full text-left",
                   isActive(item.path)
                     ? "bg-gray-100 text-primary"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
@@ -273,7 +275,7 @@ const Sidebar = ({
               >
                 {item.icon}
                 <span className="ml-3">{item.title}</span>
-              </Link>
+              </button>
             );
           })}
         </nav>
@@ -288,6 +290,7 @@ const Sidebar = ({
                   variant="ghost"
                   size="icon"
                   className="w-full flex items-center justify-center text-red-500 hover:bg-red-50 hover:text-red-600"
+                  onClick={() => onNavigation("/logout")}
                 >
                   <LogOut className="h-5 w-5" />
                 </Button>
@@ -299,6 +302,7 @@ const Sidebar = ({
           <Button
             variant="ghost"
             className="w-full flex items-center justify-start text-red-500 hover:bg-red-50 hover:text-red-600"
+            onClick={() => onNavigation("/logout")}
           >
             <LogOut className="h-5 w-5 mr-2" />
             Logout

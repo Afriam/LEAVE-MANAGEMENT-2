@@ -30,6 +30,7 @@ interface HeaderProps {
   userAvatar?: string;
   notificationCount?: number;
   onLogout?: () => void;
+  onNavigation?: (path: string) => void;
 }
 
 const Header = ({
@@ -38,6 +39,7 @@ const Header = ({
   userAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   notificationCount = 3,
   onLogout = () => console.log("Logout clicked"),
+  onNavigation = (path) => console.log(`Navigate to ${path}`),
 }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -75,14 +77,16 @@ const Header = ({
                   <ul className="space-y-2">
                     {navigationLinks.map((link) => (
                       <li key={link.name}>
-                        <Link
-                          to={link.href}
-                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
-                          onClick={() => setMobileMenuOpen(false)}
+                        <button
+                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md w-full text-left"
+                          onClick={() => {
+                            onNavigation(link.href);
+                            setMobileMenuOpen(false);
+                          }}
                         >
                           {link.icon && <link.icon className="mr-2 h-5 w-5" />}
                           {link.name}
-                        </Link>
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -99,13 +103,13 @@ const Header = ({
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           {navigationLinks.map((link) => (
-            <Link
+            <button
               key={link.name}
-              to={link.href}
+              onClick={() => onNavigation(link.href)}
               className="text-gray-700 hover:text-primary font-medium"
             >
               {link.name}
-            </Link>
+            </button>
           ))}
         </nav>
 
@@ -174,20 +178,32 @@ const Header = ({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => onNavigation("/profile")}
+              >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => onNavigation("/settings")}
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => onNavigation("/help")}
+              >
                 <HelpCircle className="mr-2 h-4 w-4" />
                 <span>Help & Support</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={onLogout}>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => onLogout()}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>

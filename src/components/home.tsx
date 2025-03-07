@@ -15,6 +15,7 @@ interface HomeProps {
   userAvatar?: string;
   department?: string;
   employeeId?: string;
+  onSignOut?: () => void;
 }
 
 const Home = ({
@@ -23,6 +24,7 @@ const Home = ({
   userAvatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
   department = "Computer Science",
   employeeId = "EMP001",
+  onSignOut = () => {},
 }: HomeProps) => {
   const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -40,10 +42,8 @@ const Home = ({
   };
 
   const handleLogout = () => {
-    // In a real app, you would clear authentication tokens here
-    alert("You have been logged out successfully!");
-    // Redirect to login page or show login form
-    setActiveView("login");
+    // Clear authentication tokens and call the parent component's onSignOut function
+    onSignOut();
   };
 
   const handleCreateLeaveRequest = () => {

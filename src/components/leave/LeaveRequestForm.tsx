@@ -112,11 +112,49 @@ const LeaveRequestForm = ({
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (data: FormValues) => {
-    // Here you would typically handle file uploads and form submission
-    console.log("Form data:", data);
-    console.log("Files:", files);
-    onSubmit(data);
+  const handleSubmit = async (data: FormValues) => {
+    try {
+      // Here you would typically handle file uploads and form submission
+      console.log("Form data:", data);
+      console.log("Files:", files);
+
+      // In a real app, you would call an API to submit the leave request
+      // For demo purposes, we'll store it in localStorage
+      const leaveData = {
+        employee_id: "EMP001", // This would come from the logged-in user
+        employee_name: "John Doe", // This would come from the logged-in user
+        department: "Computer Science", // This would come from the logged-in user
+        leave_type: data.leaveType,
+        start_date: data.dateRange.from.toISOString(),
+        end_date: data.dateRange.to.toISOString(),
+        reason: data.reason,
+        status: "pending",
+        request_date: new Date().toISOString(),
+      };
+
+      // Store in localStorage for demo purposes
+      const storedRequests = localStorage.getItem("leaveRequests");
+      const requests = storedRequests ? JSON.parse(storedRequests) : [];
+
+      const newRequest = {
+        ...leaveData,
+        id: `request-${Date.now()}`,
+      };
+
+      requests.push(newRequest);
+      localStorage.setItem("leaveRequests", JSON.stringify(requests));
+
+      // Show success message
+      alert("Leave request submitted successfully!");
+
+      // Call the onSubmit callback
+      onSubmit(data);
+    } catch (error) {
+      console.error("Error submitting leave request:", error);
+      alert(
+        "An error occurred while submitting your leave request. Please try again.",
+      );
+    }
   };
 
   return (
